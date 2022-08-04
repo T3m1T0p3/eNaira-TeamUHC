@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace enairaUHC.EnairaDbContext
 {
-    public class EnairaDbContext
+    public class EnairaDbContext:DbContext
     {
+
     }
 }

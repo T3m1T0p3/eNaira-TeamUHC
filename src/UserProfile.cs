@@ -7,5 +7,8 @@ namespace enairaUHC.src
 {
     public class UserProfile
     {
+        public Guid UserId { get; set; }
+        public Wallet Wallet {get; set;}
+
     }
 }
