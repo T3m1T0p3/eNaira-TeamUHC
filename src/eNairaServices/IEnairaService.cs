@@ -7,5 +7,9 @@ namespace enairaUHC.src.eNairaServices
 {
     interface IEnairaService
     {
+        public Task CreateEnairaUser()
+        {
+
+        }
     }
 }

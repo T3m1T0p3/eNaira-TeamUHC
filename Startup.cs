@@ -1,3 +1,5 @@
+using enairaUHC.src;
+using enairaUHC.src.DbService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,6 +13,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using enairaUHC.AppDbContext;
 
 namespace enairaUHC
 {
@@ -28,6 +32,10 @@ namespace enairaUHC
         {
 
             services.AddControllers();
+
+            services.AddDbContext<EnairaDbContext>();
+            services.AddScoped<IRepository, Repository>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "enairaUHC", Version = "v1" });

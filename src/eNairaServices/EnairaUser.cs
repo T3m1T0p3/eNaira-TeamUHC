@@ -7,5 +7,11 @@ namespace enairaUHC.src.eNairaServices
 {
     public class EnairaUser
     {
+        public string AccountNumber { get; set; }
+        public string Reference { get; set; }
+        public string CustomerTier { get; set; }
+        public string ChannelCode { get; set; }
+        public string BVN { get; set; }
+        public string Password { get; set; }
     }
 }

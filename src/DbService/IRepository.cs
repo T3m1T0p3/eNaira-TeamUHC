@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace enairaUHC.src.DbService
 {
-    public class IRepository
+    public interface IRepository
     {
+        public Task CreateUserAsync(User user);
     }
 }
