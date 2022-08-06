@@ -7,6 +7,7 @@ namespace enairaUHC.src.eNairaServices
 {
     public class EnairaUser
     {
+        public Guid EnairaUserId { get; set; }
         public string AccountNumber { get; set; }
         public string Reference { get; set; }
         public string CustomerTier { get; set; }

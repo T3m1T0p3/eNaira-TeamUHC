@@ -1,4 +1,5 @@
-﻿using System;
+﻿using enairaUHC.src.Entity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,7 +13,6 @@ namespace enairaUHC.src
         //public Guid UserId { get; set; }
         [Required]
         public string BVN { get; set; }
-
         public Wallet Wallet { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -20,7 +20,7 @@ namespace enairaUHC.src
         public string MiddleName { get; set; }
 
         //public Sha256 PasswordHash { get; set; }
-        public string HealthCareProviderCompany { get; set; }
+        public string InsureranceStatus { get; set; }
 
 
     }

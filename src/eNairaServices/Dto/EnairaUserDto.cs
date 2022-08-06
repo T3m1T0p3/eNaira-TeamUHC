@@ -9,9 +9,9 @@ namespace enairaUHC.src.eNairaServices.Dto
     {
         public string account_no { get; set; }
         public string reference { get; set; }
-        public string customer_er { get; set; }
-        public string ChannelCode { get; set; }
+        public string customer_tier { get; set; }
+        public string channel_code { get; set; }
         public string BVN { get; set; }
-        public string Password { get; set; }
+        public string password { get; set; }
     }
 }

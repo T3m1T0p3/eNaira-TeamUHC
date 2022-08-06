@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using enairaUHC.AppDbContext;
+using enairaUHC.src.eNairaServices;
 
 namespace enairaUHC
 {
@@ -23,6 +24,7 @@ namespace enairaUHC
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            
         }
 
         public IConfiguration Configuration { get; }
@@ -34,7 +36,11 @@ namespace enairaUHC
             services.AddControllers();
 
             services.AddDbContext<EnairaDbContext>();
+            services.AddScoped<EnairaDbContext>();
             services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IEnairaService, EnairaService>();
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddSwaggerGen(c =>
             {
@@ -52,7 +58,7 @@ namespace enairaUHC
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "enairaUHC v1"));
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 

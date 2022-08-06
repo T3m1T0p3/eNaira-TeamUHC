@@ -1,15 +1,13 @@
-﻿using System;
+﻿using enairaUHC.src.eNairaServices.Dto;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace enairaUHC.src.eNairaServices
 {
-    interface IEnairaService
+    public interface IEnairaService
     {
-        public Task CreateEnairaUser()
-        {
-
-        }
+        public void CreateEnairaUser(EnairaUserDto user);
     }
 }
