@@ -16,7 +16,7 @@ namespace enairaUHC.src
         public Wallet Wallet { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-
+        string AccountNumber { get; set; }
         public string MiddleName { get; set; }
 
         //public Sha256 PasswordHash { get; set; }

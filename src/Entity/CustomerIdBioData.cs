@@ -9,7 +9,7 @@ namespace enairaUHC.src.Entity
     {
         public string responseCode { get; set;}
         public string BVN {get; set;}
-        public string firstNmae { get; set; }
+        public string firstName { get; set; }
         public string lastName { get; set; }
         public string middleName { get; set; }
         public string dateOfBirth { get; set; }

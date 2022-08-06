@@ -33,46 +33,51 @@ namespace enairaUHC.Controllers
 
             //return Ok("Site Under Construction. Please check back later");
             Console.WriteLine("Hit Register");
-            //try
-            //{
-            HttpClientHandler clientHandler = new HttpClientHandler();
-            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-            HttpClient httpClient = new HttpClient(clientHandler);
+            try
+            {
+                HttpClientHandler clientHandler = new HttpClientHandler();
+                clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+                HttpClient httpClient = new HttpClient(clientHandler);
             
                 httpClient.DefaultRequestHeaders.Add("ClientId","7b1abdec77b10615306cb458b0c909c1");
-            httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
             
                 RequestBody requestBody = new RequestBody { bvn = $"{bvn}", channel_code = "APISNG" };
                 StringContent content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8,"application/json");
                 Console.WriteLine(httpClient.DefaultRequestHeaders.ToString());
-            var request = httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/customer/identity/BVN", content).Result;
+                var request = httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/customer/identity/BVN", content).Result;
                 Console.WriteLine(await request.Content.ReadAsStringAsync());
                  //Maps response to User
                 if (request.IsSuccessStatusCode)
                 {
-                CustomerIdResponse data = _mapper.Map<CustomerIdResponse>(JsonConvert.DeserializeObject(await request.Content.ReadAsStringAsync()));
-                Console.WriteLine(data.response_data.BVN);
+                    CustomerIdResponse data = _mapper.Map<CustomerIdResponse>(JsonConvert.DeserializeObject(await request.Content.ReadAsStringAsync()));
+                    Console.WriteLine(data.response_data.BVN);
                     return Ok(request.Content);
                        //return Ok();*/
-                    Console.WriteLine("Creating user");
-                    /*User user = new User
+                        Console.WriteLine("Creating user");
+                    User user = new User
                     {
                         BVN = bvn,
-                        FirstName = "Tope",
-                        LastName = "Ope",
-                        MiddleName = "Yemi",
+                        FirstName = data.response_data.firstName,
+                        LastName = data.response_data.lastName,
+                        MiddleName = data.response_data.lastName,
                         Wallet = new Wallet { BVN = bvn }
                     };
                     Console.WriteLine("Creating Enaira User");
-                    EnairaUser enairaUser = new EnairaUser { AccountNumber = "45679", CustomerTier = "1", ChannelCode = "APi", BVN = bvn, Password = bvn, Reference = "2345" };
+
+                    EnairaUser enairaUser = new EnairaUser { AccountNumber = "45679", CustomerTier = "1", ChannelCode = "APING", BVN = bvn, Password = bvn, Reference = "2345" };
                     Console.WriteLine("Calling CreateUserAsync");
                     await _repository.CreateUserAsync(user, enairaUser);
-                    return CreatedAtRoute("GetUser", new { bvn = user.BVN }, user);*/
+                    return CreatedAtRoute("GetUser", new { bvn = user.BVN }, user);
                 }
                 throw new Exception("Error");
 
-            //}
-            return BadRequest();
+            }
+            catch(Exception e)
+            {
+                return BadRequest();
+            }
+            
             //post to https://rgw.k8s.apis.ng/centric-platforms/uat/CreateConsumer
             /* body
              * {
