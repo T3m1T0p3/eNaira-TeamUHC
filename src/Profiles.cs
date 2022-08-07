@@ -13,11 +13,13 @@ namespace enairaUHC.src
     {
         public Profiles()
         {
-            CreateMap<EnairaUser, EnairaUserDto>().ForMember(dst => dst.account_no, src => src.MapFrom(acc => acc.AccountNumber)).
-                ForMember(dst => dst.customer_tier, src => src.MapFrom(customer => customer.CustomerTier)).
-                ForMember(dst => dst.channel_code, src => src.MapFrom(channel => channel.ChannelCode));
+            CreateMap<EnairaUser, string>();//.ForMember(dst => dst.account_no, src => src.MapFrom(acc => acc.AccountNumber)).
+               // ForMember(dst => dst.customer_tier, src => src.MapFrom(customer => customer.CustomerTier)).
+               // ForMember(dst => dst.channel_code, src => src.MapFrom(channel => channel.ChannelCode));
 
             CreateMap<CustomerIdResponse, string>();
+            CreateMap<EnairaGetUserResponseData, string>();
+            CreateMap<CustomerAccountDetailsResponse, string>();
         }
     }
 }

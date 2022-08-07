@@ -11,6 +11,7 @@ namespace enairaUHC.src.DbService
     public interface IRepository
     {
         public Task CreateUserAsync(User user,EnairaUserDto enairaUserDto);
+        public Task CreateUserAsync(User user);
         public Task<User> GetUserAsync(string bvn); 
         public Task AddInsurerAsync(Insurer proiver);
     }

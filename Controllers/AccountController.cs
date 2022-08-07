@@ -30,24 +30,18 @@ namespace enairaUHC.Controllers
             _mapper = mapper;
             _enairaService = enairaService;
         }
-        [HttpPost("register/{bvn}")]
-        public async Task<IActionResult> Register(string bvn,[FromQuery]string accountNumber)
+        [HttpPost("register/{bvn}/{accountNumber}")]
+        public async Task<IActionResult> Register(string bvn,string accountNumber)
         {
-
-            //return Ok("Site Under Construction. Please check back later");
             Console.WriteLine("Hit Register");
             try
             {
                 var request = await _enairaService.GetCustomerIdAsync(bvn);
-               // Console.WriteLine(await request.Content.ReadAsStringAsync());
-                 //Maps response to User
                 if (request.IsSuccessStatusCode)
                 {
                     CustomerIdResponse data = _mapper.Map<CustomerIdResponse>(JsonConvert.DeserializeObject(await request.Content.ReadAsStringAsync()));
                     Console.WriteLine(data.response_data.BVN);
-                    return Ok(request.Content);
-                       //return Ok();*/
-                        Console.WriteLine("Creating user");
+                    Console.WriteLine("Creating user account");
                     User user = new User
                     {
                         BVN = bvn,
@@ -57,9 +51,9 @@ namespace enairaUHC.Controllers
                         Wallet = new Wallet { BVN = bvn },
                         Email = data.response_data.email
                     };
-                    //return Ok(user);
                     Console.WriteLine("Creating Enaira User");
                     var accountDetails = await _enairaService.GetAccountDetailsAsync("APISNG", data.response_data.enrollmentBank, accountNumber);
+                    Console.WriteLine("Enaira User creted");
                     if (!accountDetails.IsSuccessStatusCode) throw new Exception("Invalid Account Number");
                     CustomerAccountDetailsResponse accounts = _mapper.Map<CustomerAccountDetailsResponse>(JsonConvert.DeserializeObject(await accountDetails.Content.ReadAsStringAsync()));
                     bool isValidAccount = false;
@@ -73,7 +67,7 @@ namespace enairaUHC.Controllers
                     }
                     if (!isValidAccount) throw new Exception("Invalid Account Number");
 
-                    EnairaUserDto enairaUser = new EnairaUserDto { accountNumber = accountNumber,uidType="BVN" , uid = bvn, firstName=user.FirstName,middleNmae=user.MiddleName,
+                    EnairaUserDto enairaUser = new EnairaUserDto { accountNumber = accountNumber,uidType="BVN" , uid = bvn, firstName=user.FirstName,middleName=user.MiddleName,
                                        lastName=user.LastName,emailId=user.Email,phone=data.response_data.phoneNumber1,address=data.response_data.residentialAddress,
                                         dateOfBirth=data.response_data.dateOfBirth,
                     };
@@ -81,7 +75,7 @@ namespace enairaUHC.Controllers
                     await _repository.CreateUserAsync(user, enairaUser);
                     return CreatedAtRoute("GetUser", new { bvn = user.BVN }, user);                
                 }
-                throw new Exception("Error");
+                throw new Exception(request.Headers.ToString());
 
             }
             catch(Exception e)
@@ -89,6 +83,56 @@ namespace enairaUHC.Controllers
                 return BadRequest(e.Message);
             }
             
+        }
+        [HttpPost("register/{bvn}")]
+        public async Task<IActionResult> RegisterWithoutCreatingWallet(string bvn)
+        {
+
+            Console.WriteLine("Hit Register without wallet");
+            try
+            {
+                var request = await _enairaService.GetCustomerIdAsync(bvn);
+                if (request.IsSuccessStatusCode)
+                {
+                    CustomerIdResponse data = _mapper.Map<CustomerIdResponse>(JsonConvert.DeserializeObject(await request.Content.ReadAsStringAsync()));
+                    Console.WriteLine(data.response_data.BVN);
+                    Console.WriteLine("Creating user");
+                    User user = new User
+                    {
+                        BVN = bvn,
+                        FirstName = data.response_data.firstName,
+                        LastName = data.response_data.lastName,
+                        MiddleName = data.response_data.lastName,
+                        Wallet = new Wallet { BVN = bvn },
+                        Email = data.response_data.email
+                    };
+
+                    Console.WriteLine("Calling CreateUserAsync");
+                    await _repository.CreateUserAsync(user);
+                    return CreatedAtRoute("GetUser", new { bvn = user.BVN }, user);
+                }
+                throw new Exception(await request.Content.ReadAsStringAsync());
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost("register/EnairaWallet")]
+        public async Task<IActionResult> CreateEnairaCustomer(EnairaUserDto data)
+        {
+            //User user = await_repository.GetUserAsync(bvn);
+            try
+            {
+                var newENairaUser = _enairaService.CreateEnairaUserAsync(data);
+                return Ok(newENairaUser);
+            }
+            catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
 
         [HttpPost("register/Insurer")]
@@ -121,7 +165,7 @@ namespace enairaUHC.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return NotFound(e.Message);
             }
         }
     }

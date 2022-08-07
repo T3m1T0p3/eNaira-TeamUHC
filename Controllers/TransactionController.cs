@@ -37,7 +37,7 @@ namespace enairaUHC.Controllers
                 return BadRequest(e.Message);
             }
         }
-        public IActionResult Transfer()
+        /*public IActionResult Transfer()
         {
             try
             {
@@ -50,7 +50,7 @@ namespace enairaUHC.Controllers
             }
         }
 
-        /*public IActionResult Receive()
+        public IActionResult Receive()
         {
             return null;
         }*/

@@ -1,4 +1,5 @@
-﻿using enairaUHC.src.eNairaServices.Dto;
+﻿using AutoMapper;
+using enairaUHC.src.eNairaServices.Dto;
 using enairaUHC.src.Entity;
 using Newtonsoft.Json;
 using System;
@@ -14,8 +15,13 @@ namespace enairaUHC.src.eNairaServices
 {
     public class EnairaService:IEnairaService
     {
+        IMapper _mapper;
+        public EnairaService(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
 
-        public async Task<object> GetEnairaUser(string phoneNumber,string password)
+        public async Task<string> GetEnairaUser(string phoneNumber,string password)
         {
             HttpClientHandler clientHandler = new HttpClientHandler();
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
@@ -36,6 +42,7 @@ namespace enairaUHC.src.eNairaServices
             
             var request = httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/enaira-user/GetUserDetailsByPhone", content).Result;
             string responseBody = await request.Content.ReadAsStringAsync();
+            return responseBody;
         }
         //No schema for GetBalance endpoint
         public async Task<double> GetEnairaBalance(User user)
@@ -62,7 +69,7 @@ namespace enairaUHC.src.eNairaServices
 
         //No schema for createuserconsomer endpoint
         //vague post parameters
-        public async Task<HttpStatusCode> CreateEnairaUserAsync(EnairaUserDto enairaUserDto)
+        public async Task<EnairaGetUserResponseData> CreateEnairaUserAsync(EnairaUserDto enairaUserDto)
         {
             HttpClientHandler clientHandler = new HttpClientHandler();
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
@@ -73,12 +80,14 @@ namespace enairaUHC.src.eNairaServices
 
             //CreateEnairaCustomerRequestBody requestBody = new CreateEnairaCustomerRequestBody { bvn = enairaUserDto.BVN, 
             //channel_code = "eNairaUHC", account_no=enairaUserDto.account_no, customer_tier="1", nin=enairaUserDto.NIN, password=enairaUserDto.password, reference=enairaUserDto.BVN+enairaUserDto.NIN};
-            var cbnEnairaUser = GetEnairaUser(enairaUserDto.phone);
-            
+            var cbnEnairaUser = GetEnairaUser(enairaUserDto.phone,enairaUserDto.password);
+            EnairaUserResponseBody enairaUser = _mapper.Map<EnairaUserResponseBody>(cbnEnairaUser);
+            if (enairaUser.response_code == "00") return enairaUser.response_data;
             StringContent content = new StringContent(JsonConvert.SerializeObject(enairaUserDto), Encoding.UTF8, "application/json");
             Console.WriteLine(httpClient.DefaultRequestHeaders.ToString());
             var request = httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/CreateConsumer", content).Result;
-            return request.StatusCode;
+            EnairaUserResponseBody newEnairaUser = _mapper.Map<EnairaUserResponseBody>(await request.Content.ReadAsStringAsync());
+            return newEnairaUser.response_data;
         }
 
 
@@ -96,6 +105,7 @@ namespace enairaUHC.src.eNairaServices
             StringContent content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
             Console.WriteLine(httpClient.DefaultRequestHeaders.ToString());
             var request = httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/customer/identity/BVN", content).Result;
+            Console.WriteLine(request.StatusCode.ToString());
             return request;
         }
 
@@ -113,7 +123,7 @@ namespace enairaUHC.src.eNairaServices
 
             StringContent content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
             Console.WriteLine(httpClient.DefaultRequestHeaders.ToString());
-            var request = httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/customer/identity/BVN", content).Result;
+            var request = httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/AccessBankMaintenancenEnquiry/v1/GetAccountDetails", content).Result;
             return request;
 
         }

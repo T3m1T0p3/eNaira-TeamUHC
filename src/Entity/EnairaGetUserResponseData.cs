@@ -20,7 +20,6 @@
         public string tier { get; set; }
         public WalletInfo wallet_info { get; set; }
         public string account_number {get; set;}
-        public string 
+        public string country_of_birth { get; set; }
     }
-}
 }

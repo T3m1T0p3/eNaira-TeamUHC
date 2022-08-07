@@ -24,6 +24,7 @@ namespace enairaUHC.src
         public string InsureranceStatus { get; set; }
 
         public string UserType { get; set; }
+        public string phone { get; set; }
 
 
     }

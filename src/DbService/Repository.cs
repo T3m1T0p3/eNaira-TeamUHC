@@ -30,11 +30,21 @@ namespace enairaUHC.src.DbService
                 throw new Exception("Cannot register User");
             }
             EnairaUser enairaUser = _mapper.Map<EnairaUser>(enairaUserDto);
-            var enairauser = _enairaService.GetEnairaUser();
+            var enairauser = _enairaService.GetEnairaUser(enairaUserDto.phone,enairaUserDto.password);
             if (enairauser != null) return;
             var response=await _enairaService.CreateEnairaUserAsync(enairaUserDto);
-            if (((int)response)!=200) throw new Exception("Unable to register eNaira wallet for User");
             await _enairaDbContext.ENairerUsers.AddAsync(enairaUser);
+            await _enairaDbContext.Users.AddAsync(user);
+            await _enairaDbContext.SaveChangesAsync();
+            return;
+        }
+        public async Task CreateUserAsync(User user)
+        {
+            var dbUser = await _enairaDbContext.Users.FindAsync(user.BVN);
+            if (dbUser != null)
+            {
+                throw new Exception("Cannot register User");
+            }
             await _enairaDbContext.Users.AddAsync(user);
             await _enairaDbContext.SaveChangesAsync();
             return;
@@ -43,7 +53,7 @@ namespace enairaUHC.src.DbService
         public async Task<User> GetUserAsync(string Bvn)
         {
             var user =await _enairaDbContext.Users.FindAsync(Bvn);
-            if (user == null) throw new Exception("Invalid User");
+            if (user == null) throw new Exception("Not Found");
             return user;
         }
 

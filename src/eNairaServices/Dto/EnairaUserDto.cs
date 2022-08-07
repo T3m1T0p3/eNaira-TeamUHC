@@ -13,7 +13,7 @@ namespace enairaUHC.src.eNairaServices.Dto
         public string userName { get; set; }
         public string title { get; set; } = "";
         public string firstName { get; set; }
-        public string middleNmae { get; set; }
+        public string middleName { get; set; }
         public string lastName { get; set; }
         public string phone { get; set; }
         public string emailId { get; set; }
@@ -25,9 +25,10 @@ namespace enairaUHC.src.eNairaServices.Dto
         public string accountNumber { get; set; }
         public string taxIdentificationNumber { get; set; } = "";
         public string dateOfBirth { get; set; }
-        public string countryOfBirth { get; set; }="NG"
+        public string countryOfBirth { get; set; } = "NG";
         public string referralCode { get; set; } = "Team57";
         public string remarks { get; set; } = "Created through eNaira hackathon Team57";
+        public string password { get; set; }
 
     }
 }

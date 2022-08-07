@@ -10,5 +10,5 @@ namespace enairaUHC.src.Entity
         public string response_code { get; set; }
         public string response_message { get; set; }
         public EnairaGetUserResponseData response_data { get; set; }
-        
+    }   
 }

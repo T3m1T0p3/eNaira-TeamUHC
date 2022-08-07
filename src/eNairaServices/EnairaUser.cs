@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,6 +9,7 @@ namespace enairaUHC.src.eNairaServices
     public class EnairaUser
     {
         public string channelCode { get; set; } = "APISNG";
+        [Key]
         public string uid { get; set; }
         public string uidType { get; set; }
         public string userName { get; set; }
@@ -25,7 +27,7 @@ namespace enairaUHC.src.eNairaServices
         public string accountNumber { get; set; }
         public string taxIdentificationNumber { get; set; } = "";
         public string dateOfBirth { get; set; }
-        public string countryOfBirth { get; set; } = "NG"
+        public string countryOfBirth { get; set; } = "NG";
         public string referralCode { get; set; } = "Team57";
         public string remarks { get; set; } = "Created through eNaira hackathon Team57";
     }
