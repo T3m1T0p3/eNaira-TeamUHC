@@ -21,7 +21,7 @@ namespace enairaUHC.src.eNairaServices
             _mapper = mapper;
         }
 
-        public async Task<string> GetEnairaUser(string phoneNumber,string password)
+        public async Task<HttpResponseMessage> GetEnairaUser(string phoneNumber,string password)
         {
             HttpClientHandler clientHandler = new HttpClientHandler();
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
@@ -41,8 +41,8 @@ namespace enairaUHC.src.eNairaServices
 
             
             var request = httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/enaira-user/GetUserDetailsByPhone", content).Result;
-            string responseBody = await request.Content.ReadAsStringAsync();
-            return responseBody;
+            
+            return request;
         }
         //No schema for GetBalance endpoint
         public async Task<double> GetEnairaBalance(User user)
@@ -69,7 +69,7 @@ namespace enairaUHC.src.eNairaServices
 
         //No schema for createuserconsomer endpoint
         //vague post parameters
-        public async Task<EnairaGetUserResponseData> CreateEnairaUserAsync(EnairaUserDto enairaUserDto)
+        public async Task<HttpResponseMessage> CreateEnairaUserAsync(EnairaUserDto enairaUserDto)
         {
             HttpClientHandler clientHandler = new HttpClientHandler();
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
@@ -78,16 +78,17 @@ namespace enairaUHC.src.eNairaServices
             httpClient.DefaultRequestHeaders.Add("ClientId", "7b1abdec77b10615306cb458b0c909c1");
             httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-            //CreateEnairaCustomerRequestBody requestBody = new CreateEnairaCustomerRequestBody { bvn = enairaUserDto.BVN, 
-            //channel_code = "eNairaUHC", account_no=enairaUserDto.account_no, customer_tier="1", nin=enairaUserDto.NIN, password=enairaUserDto.password, reference=enairaUserDto.BVN+enairaUserDto.NIN};
-            var cbnEnairaUser = GetEnairaUser(enairaUserDto.phone,enairaUserDto.password);
-            EnairaUserResponseBody enairaUser = _mapper.Map<EnairaUserResponseBody>(cbnEnairaUser);
-            if (enairaUser.response_code == "00") return enairaUser.response_data;
+            CreateEnairaCustomerRequestBody requestBody = new CreateEnairaCustomerRequestBody { bvn = enairaUserDto.uid, 
+            channel_code = "eNairaUHC", account_no=enairaUserDto.account_no, customer_tier="1", nin=enairaUserDto.NIN, password=enairaUserDto.password, reference=enairaUserDto.uid+enairaUserDto.NIN};
+            var cbnEnairaUser =await  GetEnairaUser(enairaUserDto.phone,enairaUserDto.password);
+            Console.WriteLine("Checking for existing EnairaUser");
+            EnairaUserResponseBody enairaUser = JsonConvert.DeserializeObject<EnairaUserResponseBody>(await cbnEnairaUser.Content.ReadAsStringAsync());
+            if (enairaUser.response_code == "00") return cbnEnairaUser;
+            Console.WriteLine("Creating new EnairaUser");
             StringContent content = new StringContent(JsonConvert.SerializeObject(enairaUserDto), Encoding.UTF8, "application/json");
-            Console.WriteLine(httpClient.DefaultRequestHeaders.ToString());
             var request = httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/CreateConsumer", content).Result;
-            EnairaUserResponseBody newEnairaUser = _mapper.Map<EnairaUserResponseBody>(await request.Content.ReadAsStringAsync());
-            return newEnairaUser.response_data;
+            //EnairaUserResponseBody newEnairaUser = _mapper.Map<EnairaUserResponseBody>(await request.Content.ReadAsStringAsync());
+            return request;
         }
 
 

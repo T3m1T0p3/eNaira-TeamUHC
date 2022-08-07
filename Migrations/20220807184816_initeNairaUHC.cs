@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace enairaUHC.Migrations
 {
-    public partial class initeNairaUHCSolution : Migration
+    public partial class initeNairaUHC : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ENairerUsers",
+                name: "ENairaUsers",
                 columns: table => new
                 {
                     uid = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -17,7 +17,7 @@ namespace enairaUHC.Migrations
                     userName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     firstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    middleNmae = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    middleName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     lastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     emailId = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -31,11 +31,12 @@ namespace enairaUHC.Migrations
                     dateOfBirth = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     countryOfBirth = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     referralCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    remarks = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    password = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ENairerUsers", x => x.uid);
+                    table.PrimaryKey("PK_ENairaUsers", x => x.uid);
                 });
 
             migrationBuilder.CreateTable(
@@ -115,7 +116,7 @@ namespace enairaUHC.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ENairerUsers");
+                name: "ENairaUsers");
 
             migrationBuilder.DropTable(
                 name: "Insurers");

@@ -11,12 +11,12 @@ namespace enairaUHC.src.eNairaServices
 {
     public interface IEnairaService
     {
-        public Task<EnairaGetUserResponseData> CreateEnairaUserAsync(EnairaUserDto data);
+        public Task<HttpResponseMessage> CreateEnairaUserAsync(EnairaUserDto data);
         public Task<HttpResponseMessage> GetCustomerIdAsync(string bvn);
 
         public Task<HttpResponseMessage> GetAccountDetailsAsync(string channel, string bankCode, string accountNumber);
 
-        public Task<string> GetEnairaUser(string phone, string password);
+        public Task<HttpResponseMessage> GetEnairaUser(string phone, string password);
 
         public Task<double> GetEnairaBalance(User user);
     }

@@ -37,7 +37,8 @@ namespace enairaUHC.Controllers
                 return BadRequest(e.Message);
             }
         }
-        /*public IActionResult Transfer()
+
+        /*public IActionResult TransferToInsurer()
         {
             try
             {
@@ -50,7 +51,7 @@ namespace enairaUHC.Controllers
             }
         }
 
-        public IActionResult Receive()
+        public IActionResult DepositToCustomerWallet()
         {
             return null;
         }*/

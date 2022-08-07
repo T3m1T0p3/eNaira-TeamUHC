@@ -10,8 +10,8 @@ using enairaUHC.AppDbContext;
 namespace enairaUHC.Migrations
 {
     [DbContext(typeof(EnairaDbContext))]
-    [Migration("20220807073539_initeNairaUHCSolution")]
-    partial class initeNairaUHCSolution
+    [Migration("20220807184816_initeNairaUHC")]
+    partial class initeNairaUHC
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -119,7 +119,7 @@ namespace enairaUHC.Migrations
                     b.ToTable("Wallet");
                 });
 
-            modelBuilder.Entity("enairaUHC.src.eNairaServices.EnairaUser", b =>
+            modelBuilder.Entity("enairaUHC.src.eNairaServices.Dto.EnairaUser", b =>
                 {
                     b.Property<string>("uid")
                         .HasColumnType("nvarchar(450)");
@@ -154,7 +154,10 @@ namespace enairaUHC.Migrations
                     b.Property<string>("lastName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("middleNmae")
+                    b.Property<string>("middleName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("password")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("phone")
@@ -186,7 +189,7 @@ namespace enairaUHC.Migrations
 
                     b.HasKey("uid");
 
-                    b.ToTable("ENairerUsers");
+                    b.ToTable("ENairaUsers");
                 });
 
             modelBuilder.Entity("enairaUHC.src.User", b =>

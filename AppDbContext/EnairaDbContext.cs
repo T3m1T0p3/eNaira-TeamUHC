@@ -1,5 +1,6 @@
 ﻿using enairaUHC.src;
 using enairaUHC.src.eNairaServices;
+using enairaUHC.src.eNairaServices.Dto;
 using enairaUHC.src.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,7 +15,7 @@ namespace enairaUHC.AppDbContext
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
-        public DbSet<EnairaUser> ENairerUsers { get; set; }
+        public DbSet<EnairaUser> ENairaUsers { get; set; }
         public DbSet<Insurer> Insurers { get; set; }
         IConfiguration _configuration;
         public EnairaDbContext() { }

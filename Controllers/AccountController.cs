@@ -69,13 +69,14 @@ namespace enairaUHC.Controllers
 
                     EnairaUserDto enairaUser = new EnairaUserDto { accountNumber = accountNumber,uidType="BVN" , uid = bvn, firstName=user.FirstName,middleName=user.MiddleName,
                                        lastName=user.LastName,emailId=user.Email,phone=data.response_data.phoneNumber1,address=data.response_data.residentialAddress,
-                                        dateOfBirth=data.response_data.dateOfBirth,
+                                        dateOfBirth=data.response_data.dateOfBirth,NIN=data.response_data.NIN,password=bvn+data.response_data.NIN
                     };
+
                     Console.WriteLine("Calling CreateUserAsync");
                     await _repository.CreateUserAsync(user, enairaUser);
                     return CreatedAtRoute("GetUser", new { bvn = user.BVN }, user);                
                 }
-                throw new Exception(request.Headers.ToString());
+                throw new Exception("AFF Server Error: "+request.Headers.ToString());
 
             }
             catch(Exception e)
@@ -84,6 +85,10 @@ namespace enairaUHC.Controllers
             }
             
         }
+
+        //4574249a887cc8df76ce3bfa4ebfb65e
+        //fcfae588b4c471c048baca5e62eed5b2
+
         [HttpPost("register/{bvn}")]
         public async Task<IActionResult> RegisterWithoutCreatingWallet(string bvn)
         {
@@ -125,8 +130,9 @@ namespace enairaUHC.Controllers
             //User user = await_repository.GetUserAsync(bvn);
             try
             {
-                var newENairaUser = _enairaService.CreateEnairaUserAsync(data);
-                return Ok(newENairaUser);
+                var newENairaUser =await  _enairaService.CreateEnairaUserAsync(data);
+
+                return Ok(await newENairaUser.Content.ReadAsStringAsync());
             }
             catch(Exception e)
             {

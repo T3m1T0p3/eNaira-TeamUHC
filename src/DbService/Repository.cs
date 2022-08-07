@@ -3,6 +3,7 @@ using enairaUHC.AppDbContext;
 using enairaUHC.src.eNairaServices;
 using enairaUHC.src.eNairaServices.Dto;
 using enairaUHC.src.Entity;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,16 +25,24 @@ namespace enairaUHC.src.DbService
 
         public async Task CreateUserAsync(User user,EnairaUserDto enairaUserDto)
         {
+            Console.WriteLine("Reppsitory CreateUserAsync Hit");
             var dbUser =await  _enairaDbContext.Users.FindAsync(user.BVN);
             if (dbUser != null)
             {
                 throw new Exception("Cannot register User");
             }
-            EnairaUser enairaUser = _mapper.Map<EnairaUser>(enairaUserDto);
-            var enairauser = _enairaService.GetEnairaUser(enairaUserDto.phone,enairaUserDto.password);
-            if (enairauser != null) return;
-            var response=await _enairaService.CreateEnairaUserAsync(enairaUserDto);
-            await _enairaDbContext.ENairerUsers.AddAsync(enairaUser);
+            Console.WriteLine("Calling GetEnairaUser");
+            var text = await _enairaService.GetEnairaUser(enairaUserDto.phone, enairaUserDto.password);
+            Console.WriteLine(await text.Content.ReadAsStringAsync());
+
+            EnairaUserResponseBody enairauser = JsonConvert.DeserializeObject<EnairaUserResponseBody>(await text.Content.ReadAsStringAsync());// _mapper.Map<EnairaUserResponseBody>(await text.Content.ReadAsStringAsync());
+            Console.WriteLine(enairauser.response_code);
+            if (enairauser.response_code != "00") {
+                var response = await _enairaService.CreateEnairaUserAsync(enairaUserDto);
+                EnairaUser enairaUser = _mapper.Map<EnairaUser>(enairaUserDto);
+                await _enairaDbContext.ENairaUsers.AddAsync(enairaUser);
+            }
+            Console.WriteLine("Saving...");
             await _enairaDbContext.Users.AddAsync(user);
             await _enairaDbContext.SaveChangesAsync();
             return;
