@@ -22,16 +22,18 @@ namespace enairaUHC.src.DbService
             _mapper = mapper;
         }
 
-        public async Task CreateUserAsync(User user,EnairaUser enairaUser)
+        public async Task CreateUserAsync(User user,EnairaUserDto enairaUserDto)
         {
             var dbUser =await  _enairaDbContext.Users.FindAsync(user.BVN);
             if (dbUser != null)
             {
                 throw new Exception("Cannot register User");
             }
-            EnairaUserDto enairaUserDto = _mapper.Map<EnairaUserDto>(enairaUser);
-            _enairaService.CreateEnairaUser(enairaUserDto);
-
+            EnairaUser enairaUser = _mapper.Map<EnairaUser>(enairaUserDto);
+            var enairauser = _enairaService.GetEnairaUser();
+            if (enairauser != null) return;
+            var response=await _enairaService.CreateEnairaUserAsync(enairaUserDto);
+            if (((int)response)!=200) throw new Exception("Unable to register eNaira wallet for User");
             await _enairaDbContext.ENairerUsers.AddAsync(enairaUser);
             await _enairaDbContext.Users.AddAsync(user);
             await _enairaDbContext.SaveChangesAsync();

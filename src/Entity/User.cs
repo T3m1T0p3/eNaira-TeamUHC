@@ -13,6 +13,7 @@ namespace enairaUHC.src
         //public Guid UserId { get; set; }
         [Required]
         public string BVN { get; set; }
+        public string Email { get; set; }
         public Wallet Wallet { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -21,6 +22,8 @@ namespace enairaUHC.src
 
         //public Sha256 PasswordHash { get; set; }
         public string InsureranceStatus { get; set; }
+
+        public string UserType { get; set; }
 
 
     }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace enairaUHC.src.Entity
 {
-    public class RequestBody
+    public class GetCustomerDetailsRequestBody
     {
         public string bvn { get; set; }
         public string channel_code { get; set; }

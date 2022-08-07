@@ -2,6 +2,7 @@
 using enairaUHC.src;
 using enairaUHC.src.DbService;
 using enairaUHC.src.eNairaServices;
+using enairaUHC.src.eNairaServices.Dto;
 using enairaUHC.src.Entity;
 using enairaUHC.src.Entity.Dto;
 using Microsoft.AspNetCore.Mvc;
@@ -22,31 +23,23 @@ namespace enairaUHC.Controllers
     {
         IRepository _repository;
         IMapper _mapper;
-        public AccountController(IRepository context,IMapper mapper)
+        IEnairaService _enairaService;
+        public AccountController(IRepository context,IMapper mapper,IEnairaService enairaService)
         {
             _repository = context;
             _mapper = mapper;
+            _enairaService = enairaService;
         }
         [HttpPost("register/{bvn}")]
-        public async Task<IActionResult> Register(string bvn)
+        public async Task<IActionResult> Register(string bvn,[FromQuery]string accountNumber)
         {
 
             //return Ok("Site Under Construction. Please check back later");
             Console.WriteLine("Hit Register");
             try
             {
-                HttpClientHandler clientHandler = new HttpClientHandler();
-                clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-                HttpClient httpClient = new HttpClient(clientHandler);
-            
-                httpClient.DefaultRequestHeaders.Add("ClientId","7b1abdec77b10615306cb458b0c909c1");
-                httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-            
-                RequestBody requestBody = new RequestBody { bvn = $"{bvn}", channel_code = "APISNG" };
-                StringContent content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8,"application/json");
-                Console.WriteLine(httpClient.DefaultRequestHeaders.ToString());
-                var request = httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/customer/identity/BVN", content).Result;
-                Console.WriteLine(await request.Content.ReadAsStringAsync());
+                var request = await _enairaService.GetCustomerIdAsync(bvn);
+               // Console.WriteLine(await request.Content.ReadAsStringAsync());
                  //Maps response to User
                 if (request.IsSuccessStatusCode)
                 {
@@ -61,48 +54,46 @@ namespace enairaUHC.Controllers
                         FirstName = data.response_data.firstName,
                         LastName = data.response_data.lastName,
                         MiddleName = data.response_data.lastName,
-                        Wallet = new Wallet { BVN = bvn }
+                        Wallet = new Wallet { BVN = bvn },
+                        Email = data.response_data.email
                     };
+                    //return Ok(user);
                     Console.WriteLine("Creating Enaira User");
+                    var accountDetails = await _enairaService.GetAccountDetailsAsync("APISNG", data.response_data.enrollmentBank, accountNumber);
+                    if (!accountDetails.IsSuccessStatusCode) throw new Exception("Invalid Account Number");
+                    CustomerAccountDetailsResponse accounts = _mapper.Map<CustomerAccountDetailsResponse>(JsonConvert.DeserializeObject(await accountDetails.Content.ReadAsStringAsync()));
+                    bool isValidAccount = false;
+                    foreach(CustomerAccountDetails details in accounts.getcustomeracctsdetailsresp)
+                    {
+                        if (details.accountNo == accountNumber)
+                        {
+                            isValidAccount = true;
+                            break;
+                        }
+                    }
+                    if (!isValidAccount) throw new Exception("Invalid Account Number");
 
-                    EnairaUser enairaUser = new EnairaUser { AccountNumber = "45679", CustomerTier = "1", ChannelCode = "APING", BVN = bvn, Password = bvn, Reference = "2345" };
+                    EnairaUserDto enairaUser = new EnairaUserDto { accountNumber = accountNumber,uidType="BVN" , uid = bvn, firstName=user.FirstName,middleNmae=user.MiddleName,
+                                       lastName=user.LastName,emailId=user.Email,phone=data.response_data.phoneNumber1,address=data.response_data.residentialAddress,
+                                        dateOfBirth=data.response_data.dateOfBirth,
+                    };
                     Console.WriteLine("Calling CreateUserAsync");
                     await _repository.CreateUserAsync(user, enairaUser);
-                    return CreatedAtRoute("GetUser", new { bvn = user.BVN }, user);
+                    return CreatedAtRoute("GetUser", new { bvn = user.BVN }, user);                
                 }
                 throw new Exception("Error");
 
             }
             catch(Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
             
-            //post to https://rgw.k8s.apis.ng/centric-platforms/uat/CreateConsumer
-            /* body
-             * {
-                "channel_code": "NEXTGEN",
-                "customer_tier": "2",
-                "reference": "NXG34567898FGHJJB1",
-                "account_no": "0689658501",
-                 "bvn": "22152793496",
-                "password": "Password10$$",
-                "nin": ""
-                }
-
-
-
-             REQ: POST https://rgw.k8s.apis.ng/centric-platforms/uat/CreateConsumer
-                Headers:
-                Content-Type: application/json
-                Accept: application/json
-                ClientId: 7b1abdec77b10615306cb458b0c909c1*/
         }
 
         [HttpPost("register/Insurer")]
         public async Task<IActionResult> AddInsurer([FromBody] InsurerDto provider)
         {
-           return Ok("See User Registration page at /register/yourBVN");
             try
             {
                 User user = await _repository.GetUserAsync(provider.BVN);
@@ -122,7 +113,6 @@ namespace enairaUHC.Controllers
         [HttpGet("User/{bvn}",Name="GetUser")]
         public async Task<IActionResult> GetUser(string bvn)
         {
-            return Ok("No user in the Databse");
             try
             {
                 var user = await _repository.GetUserAsync(bvn);

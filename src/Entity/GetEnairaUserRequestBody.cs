@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace enairaUHC.src.Entity
 {
-    public class GetEnairaBalanceRequestBody
+    public class GetEnairaUserRequestBody
     {
-        public string user_email { get; set; }
+        public string phone_number { get; set; }
         public string user_type { get; set; } = "USER";
-        public string channel_code { get; set; } = "eNairaUHC";
+        public string channel_code { get; set; } = "APISNG";
     }
 }

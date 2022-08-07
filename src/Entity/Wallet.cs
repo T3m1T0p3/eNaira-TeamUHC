@@ -8,7 +8,6 @@ namespace enairaUHC.src
         [Key]
         public Guid WalletAddress { get; set; }
         public string BVN { get; set; }
-        
         public double Balance { get; set; } = 0;
     }
 }
