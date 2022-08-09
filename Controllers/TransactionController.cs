@@ -1,5 +1,6 @@
 ﻿using enairaUHC.src.DbService;
 using enairaUHC.src.eNairaServices;
+using enairaUHC.src.Entity.Dto;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -21,16 +22,16 @@ namespace enairaUHC.Controllers
             _enairaService = enairaService;
         }
 
-        [HttpGet("/getbalance/{bvn}")]
-        public async Task<IActionResult> GetBalance(string bvn)
+        [HttpGet("/getbalance/{userId}")]
+        public async Task<IActionResult> GetBalance(string userId,[FromQuery]string password)
         {
             try
             {
-                var user = await _repository.GetUserAsync(bvn);
-                if (user == null) throw new Exception("Invalid User");
-                double bal = await _enairaService.GetEnairaBalance(user);
-                var balance=user.Wallet.Balance;
-                return Ok(balance);
+                var token = await _enairaService.GetTokenAsync(userId,password);
+                Console.WriteLine(token);
+                var balance = await _enairaService.GetEnairaBalance(userId,token);
+                var Balance = new EnairaBalance { Balance = balance };
+                return Ok(Balance);
             }
             catch(Exception e)
             {

@@ -19,5 +19,7 @@ namespace enairaUHC.src.eNairaServices
         public Task<HttpResponseMessage> GetEnairaUser(string phone, string password);
 
         public Task<double> GetEnairaBalance(User user);
+        public Task<double> GetEnairaBalance(string userId,string password);
+        public Task<string> GetTokenAsync(string userId, string password);
     }
 }

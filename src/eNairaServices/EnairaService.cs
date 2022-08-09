@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using enairaUHC.src.eNairaServices.Dto;
 using enairaUHC.src.Entity;
+using enairaUHC.src.Entity.Dto;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -123,10 +124,42 @@ namespace enairaUHC.src.eNairaServices
                 bank_code = $"{bankCode}" ,account_no = $"{accountNumber}" };
 
             StringContent content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
-            Console.WriteLine(httpClient.DefaultRequestHeaders.ToString());
+            //Console.WriteLine(httpClient.DefaultRequestHeaders.ToString());
             var request = httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/AccessBankMaintenancenEnquiry/v1/GetAccountDetails", content).Result;
             return request;
 
+        }
+
+        public async Task<string> GetTokenAsync(string userId,string password)
+        {
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient httpClient = new HttpClient(clientHandler);
+            httpClient.DefaultRequestHeaders.Add("ClientId", "7b1abdec77b10615306cb458b0c909c1");
+            httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            GetTokenRequestBody body = new GetTokenRequestBody { user_id = userId, password = $"{password}" };
+            StringContent content = new StringContent(JsonConvert.SerializeObject(body),Encoding.UTF8,"application/json");
+            var request = httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/CAMLLogin", content).Result;
+            var response=JsonConvert.DeserializeObject<GetTokenResponseBody>(await request.Content.ReadAsStringAsync());
+            return response.response_data.token;
+        }
+
+        public async Task<double> GetEnairaBalance(string userId,string token)
+        {
+            HttpClientHandler clientHandler = new HttpClientHandler();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            HttpClient httpClient = new HttpClient(clientHandler);
+            httpClient.DefaultRequestHeaders.Add("ClientId", "7b1abdec77b10615306cb458b0c909c1");
+            httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+            GetEnairaBalanceRequestBody body = new GetEnairaBalanceRequestBody { user_email = userId, user_token = $"{token}" };
+            StringContent content = new StringContent(JsonConvert.SerializeObject(body),Encoding.UTF8,"application/json");
+            var request = await httpClient.PostAsync("https://rgw.k8s.apis.ng/centric-platforms/uat/GetBalance", content);
+            var response = await request.Content.ReadAsStringAsync();
+            string balance= JsonConvert.DeserializeObject<GetEnairaBalanceResponseBody>(response).response_data.wallet_balance;
+            double numBalance = 0;
+            double.TryParse(balance,out numBalance);
+            return numBalance;
         }
     }
 }

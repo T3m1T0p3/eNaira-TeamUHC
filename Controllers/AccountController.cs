@@ -36,13 +36,13 @@ namespace enairaUHC.Controllers
             Console.WriteLine("Hit Register");
             try
             {
-                var request = await _enairaService.GetCustomerIdAsync(bvn);
-                if (request.IsSuccessStatusCode)
+                //ar request = await _enairaService.GetCustomerIdAsync(bvn);
+                if (true)//request.IsSuccessStatusCode)
                 {
-                    CustomerIdResponse data = _mapper.Map<CustomerIdResponse>(JsonConvert.DeserializeObject(await request.Content.ReadAsStringAsync()));
-                    Console.WriteLine(data.response_data.BVN);
+                    //CustomerIdResponse data = _mapper.Map<CustomerIdResponse>(JsonConvert.DeserializeObject(await request.Content.ReadAsStringAsync()));
+                    //Console.WriteLine(data.response_data.BVN);
                     Console.WriteLine("Creating user account");
-                    User user = new User
+                    /*User user = new User
                     {
                         BVN = bvn,
                         FirstName = data.response_data.firstName,
@@ -50,11 +50,11 @@ namespace enairaUHC.Controllers
                         MiddleName = data.response_data.lastName,
                         Wallet = new Wallet { BVN = bvn },
                         Email = data.response_data.email
-                    };
+                    };*/
                     Console.WriteLine("Creating Enaira User");
-                    var accountDetails = await _enairaService.GetAccountDetailsAsync("APISNG", data.response_data.enrollmentBank, accountNumber);
+                    //var accountDetails = await _enairaService.GetAccountDetailsAsync("APISNG", data.response_data.enrollmentBank, accountNumber);
                     Console.WriteLine("Enaira User creted");
-                    if (!accountDetails.IsSuccessStatusCode) throw new Exception("Invalid Account Number");
+                    /*if (false) throw new Exception("Invalid Account Number");
                     CustomerAccountDetailsResponse accounts = _mapper.Map<CustomerAccountDetailsResponse>(JsonConvert.DeserializeObject(await accountDetails.Content.ReadAsStringAsync()));
                     bool isValidAccount = false;
                     foreach(CustomerAccountDetails details in accounts.getcustomeracctsdetailsresp)
@@ -73,10 +73,19 @@ namespace enairaUHC.Controllers
                     };
 
                     Console.WriteLine("Calling CreateUserAsync");
-                    await _repository.CreateUserAsync(user, enairaUser);
-                    return CreatedAtRoute("GetUser", new { bvn = user.BVN }, user);                
+                    await _repository.CreateUserAsync(user, enairaUser);*/
+                    User user = new User
+                    {
+                        BVN = bvn,
+                        FirstName = "FIRSTNAME",//data.response_data.firstName,
+                        LastName = "LASTNAME",//data.response_data.lastName,
+                        MiddleName = "MiddlenMe",//data.response_data.lastName,
+                        Wallet = new Wallet { BVN = "BVN" },
+                        Email = "newUser@email.com"//data.response_data.email
+                    };
+                    return Ok(user);//CreatedAtRoute("GetUser", new { bvn = user.BVN }, user);                
                 }
-                throw new Exception("AFF Server Error: "+request.Headers.ToString());
+                throw new Exception();// "AFF Server Error: "+request.Headers.ToString());
 
             }
             catch(Exception e)
@@ -96,27 +105,27 @@ namespace enairaUHC.Controllers
             Console.WriteLine("Hit Register without wallet");
             try
             {
-                var request = await _enairaService.GetCustomerIdAsync(bvn);
-                if (request.IsSuccessStatusCode)
+                ///var request = await _enairaService.GetCustomerIdAsync(bvn);
+                if (true)//request.IsSuccessStatusCode)
                 {
-                    CustomerIdResponse data = _mapper.Map<CustomerIdResponse>(JsonConvert.DeserializeObject(await request.Content.ReadAsStringAsync()));
-                    Console.WriteLine(data.response_data.BVN);
+                    //CustomerIdResponse data = _mapper.Map<CustomerIdResponse>(JsonConvert.DeserializeObject(await request.Content.ReadAsStringAsync()));
+                    //Console.WriteLine(data.response_data.BVN);
                     Console.WriteLine("Creating user");
                     User user = new User
                     {
                         BVN = bvn,
-                        FirstName = data.response_data.firstName,
-                        LastName = data.response_data.lastName,
-                        MiddleName = data.response_data.lastName,
-                        Wallet = new Wallet { BVN = bvn },
-                        Email = data.response_data.email
+                        FirstName = "FIRSTNAME",//data.response_data.firstName,
+                        LastName = "LASTNAME",//data.response_data.lastName,
+                        MiddleName = "MiddlenMe",//data.response_data.lastName,
+                        Wallet = new Wallet { BVN = "BVN" },
+                        Email = "newUser@email.com"//data.response_data.email
                     };
 
-                    Console.WriteLine("Calling CreateUserAsync");
-                    await _repository.CreateUserAsync(user);
-                    return CreatedAtRoute("GetUser", new { bvn = user.BVN }, user);
+                    //Console.WriteLine("Calling CreateUserAsync");
+                    //await _repository.CreateUserAsync(user);
+                    return Ok(user);//CreatedAtRoute("GetUser", new { bvn = user.BVN }, user);
                 }
-                throw new Exception(await request.Content.ReadAsStringAsync());
+                throw new Exception();//await request.Content.ReadAsStringAsync());
             }
             catch (Exception e)
             {
@@ -130,9 +139,9 @@ namespace enairaUHC.Controllers
             //User user = await_repository.GetUserAsync(bvn);
             try
             {
-                var newENairaUser =await  _enairaService.CreateEnairaUserAsync(data);
+                //var newENairaUser =await  _enairaService.CreateEnairaUserAsync(data);
 
-                return Ok(await newENairaUser.Content.ReadAsStringAsync());
+                return Ok(new EnairaUserResponseBody { response_code = "00", response_message = "Success", response_data = new EnairaGetUserResponseData() }); //await newENairaUser.Content.ReadAsStringAsync());
             }
             catch(Exception e)
             {
@@ -146,10 +155,10 @@ namespace enairaUHC.Controllers
         {
             try
             {
-                User user = await _repository.GetUserAsync(provider.BVN);
-                Insurer insurer = _mapper.Map<Insurer>(provider);
-                await _repository.AddInsurerAsync(insurer);
-                return CreatedAtRoute("GetUser",new { bvn = user.BVN },user);
+                //User user = await _repository.GetUserAsync(provider.BVN);
+                //Insurer insurer = _mapper.Map<Insurer>(provider);
+                //await _repository.AddInsurerAsync(insurer);
+                return Ok(new Insurer { InsurerId="HealthCareInsuance unique Id",WalletAddress="Company's eNaira Address",Name="Company Name"});//CreatedAtRoute("GetUser",new { bvn = user.BVN },user);
             }
 
             catch (Exception e)
@@ -165,7 +174,16 @@ namespace enairaUHC.Controllers
         {
             try
             {
-                var user = await _repository.GetUserAsync(bvn);
+                //var user = await _repository.GetUserAsync(bvn);
+                User user = new User
+                {
+                    BVN = bvn,
+                    FirstName = "FIRSTNAME",//data.response_data.firstName,
+                    LastName = "LASTNAME",//data.response_data.lastName,
+                    MiddleName = "MiddlenMe",//data.response_data.lastName,
+                        Wallet = new Wallet { BVN = "BVN" },
+                    Email = "newUser@email.com"//data.response_data.email
+                };
 
                 return Ok(user);
             }

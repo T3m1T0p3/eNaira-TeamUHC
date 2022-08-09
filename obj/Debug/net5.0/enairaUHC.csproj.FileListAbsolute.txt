@@ -59,3 +59,5 @@ C:\Users\Oyinlola\source\repos\enairaUHC\obj\Debug\net5.0\enairaUHC.dll
 C:\Users\Oyinlola\source\repos\enairaUHC\obj\Debug\net5.0\ref\enairaUHC.dll
 C:\Users\Oyinlola\source\repos\enairaUHC\obj\Debug\net5.0\enairaUHC.pdb
 C:\Users\Oyinlola\source\repos\enairaUHC\obj\Debug\net5.0\enairaUHC.genruntimeconfig.cache
+C:\Users\Oyinlola\source\repos\enairaUHC\bin\Debug\net5.0\Npgsql.dll
+C:\Users\Oyinlola\source\repos\enairaUHC\bin\Debug\net5.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
